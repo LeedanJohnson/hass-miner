@@ -136,6 +136,10 @@ class MinerPowerLimitNumber(CoordinatorEntity[MinerCoordinator], NumberEntity):
                 f"{self.coordinator.config_entry.title}: Tuning not supported."
             )
 
+        result = await miner.get_wattage_limit()
+        if result == (int(value)):
+            return
+
         result = await miner.set_power_limit(int(value))
 
         if not result:
