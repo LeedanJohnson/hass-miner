@@ -4,10 +4,24 @@ from __future__ import annotations
 
 try:
     import pyasic
+    
+    # Check if installed version matches the required version
+    from .const import PYASIC_VERSION
+    import pkg_resources
+    
+    installed_version = pkg_resources.get_distribution("pyasic").version
+    if installed_version != PYASIC_VERSION:
+        from .patch import install_package
+        install_package(f"pyasic=={PYASIC_VERSION}")
+        # Reload pyasic to use the new version
+        import importlib
+        pyasic = importlib.reload(pyasic)
+        
 except ImportError:
+    # pyasic not installed at all
     from .patch import install_package
     from .const import PYASIC_VERSION
-
+    
     install_package(f"pyasic=={PYASIC_VERSION}")
     import pyasic
 

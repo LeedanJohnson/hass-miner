@@ -131,14 +131,14 @@ class MinerCoordinator(DataUpdateCoordinator):
             "make": miner_data.make,
             "model": miner_data.model,
             "ip": self.miner.ip,
-            "is_mining": miner_data.is_mining,
+            "is_mining": bool(miner_data.wattage),
             "fw_ver": miner_data.fw_ver,
             "miner_sensors": {
                 "hashrate": hashrate,
                 "ideal_hashrate": expected_hashrate,
                 "temperature": miner_data.temperature_avg,
                 "power_limit": miner_data.wattage_limit,
-                "miner_consumption": miner_data.wattage,
+                "miner_consumption": miner_data.wattage if bool(miner_data.wattage) else 0,
                 "efficiency": miner_data.efficiency,
             },
             "board_sensors": {

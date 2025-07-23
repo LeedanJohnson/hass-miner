@@ -110,7 +110,7 @@ class MinerPowerLimitNumber(CoordinatorEntity[MinerCoordinator], NumberEntity):
     @property
     def native_max_value(self) -> float | None:
         """Return device maximum value."""
-        return 10000
+        return 3000
 
     @property
     def native_step(self) -> float | None:
@@ -135,6 +135,10 @@ class MinerPowerLimitNumber(CoordinatorEntity[MinerCoordinator], NumberEntity):
             raise TypeError(
                 f"{self.coordinator.config_entry.title}: Tuning not supported."
             )
+
+        result = await miner.get_wattage_limit()
+        if result == (int(value)):
+            return
 
         result = await miner.set_power_limit(int(value))
 

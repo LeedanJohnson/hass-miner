@@ -79,11 +79,17 @@ class MinerActiveSwitch(CoordinatorEntity[MinerCoordinator], SwitchEntity):
         if not miner.supports_shutdown:
             raise TypeError(f"{miner}: Shutdown not supported.")
         self._attr_is_on = True
-        await miner.resume_mining()
-        if miner.supports_power_modes:
-            config = await miner.get_config()
-            config.mining_mode = self._last_mining_mode
-            await miner.send_config(config)
+        
+        result = await miner.get_wattage() # is_mining always returns true
+        _LOGGER.debug(result)
+        if result:
+            _LOGGER.debug("Already mining")
+        else:
+            await miner.resume_mining()
+            if miner.supports_power_modes:
+                config = await miner.get_config()
+                config.mining_mode = self._last_mining_mode
+                await miner.send_config(config)
         self.updating_switch = True
         self.async_write_ha_state()
 
@@ -96,7 +102,13 @@ class MinerActiveSwitch(CoordinatorEntity[MinerCoordinator], SwitchEntity):
         if miner.supports_power_modes:
             self._last_mining_mode = self.coordinator.data["config"].mining_mode
         self._attr_is_on = False
-        await miner.stop_mining()
+        
+        result = await miner.get_wattage() # is_mining always returns true
+        _LOGGER.debug(result)
+        if not result:
+            _LOGGER.debug("Already stopped")
+        else:
+            await miner.stop_mining()
         self.updating_switch = True
         self.async_write_ha_state()
 
